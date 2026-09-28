@@ -8,9 +8,12 @@ def get_gemini_response(prompt):
     if not GEMINI_API_KEY:
         print("GEMINI_API_KEY missing!")
         return None
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    
+    # Correct updated Gemini API Endpoint
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     headers = {'Content-Type': 'application/json'}
     data = {"contents": [{"parts": [{"text": prompt}]}]}
+    
     req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers)
     try:
         with urllib.request.urlopen(req) as response:
@@ -44,12 +47,12 @@ if gen_output:
         if raw_p.strip():
             products_data.append({"id": idx, "content": raw_p.strip()})
 else:
-    # Safe Fallback to guarantee files creation
+    # Backup Fallback
     for idx in range(1, 6):
         content = f"# Digital Product {idx}: Automation Toolkit\n\nPrice: ${4.99 + idx}\n\n## Description\nComplete guide for digital automation.\n\n## Script\nVisual: Dynamic preview of digital dashboard.\nVoiceover: Grow your ChatCommerce business on autopilot!\n\n#chatcommerce #automation"
         products_data.append({"id": idx, "content": content})
 
-# 1. Generate Individual Styled Product HTML Pages
+# 1. Generate Product HTML Details Pages with Direct Back Link
 for p in products_data:
     filename = f"products/product_{p['id']}.html"
     p_html = f"""<!DOCTYPE html>
@@ -60,12 +63,12 @@ for p in products_data:
     <title>Product #{p['id']} Details</title>
     <style>
         body {{ font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; max-width: 800px; margin: 0 auto; }}
-        .btn {{ display: inline-block; background: #38bdf8; color: #0f172a; font-weight: bold; padding: 10px 18px; border-radius: 8px; text-decoration: none; margin-bottom: 20px; border: none; cursor: pointer; }}
+        .btn {{ display: inline-block; background: #38bdf8; color: #0f172a; font-weight: bold; padding: 10px 18px; border-radius: 8px; text-decoration: none; margin-bottom: 20px; }}
         .card {{ background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155; line-height: 1.6; white-space: pre-wrap; }}
     </style>
 </head>
 <body>
-    <a href="../index.html" class="btn">← Back to Dashboard</a>
+    <a href="https://shahram-design.github.io/my-whop-bot/" class="btn">← Back to Dashboard</a>
     <div class="card">{p['content']}</div>
 </body>
 </html>
@@ -73,7 +76,7 @@ for p in products_data:
     with open(filename, "w", encoding="utf-8") as f:
         f.write(p_html)
 
-# 2. Generate Main index.html Dashboard
+# 2. Generate Main Dashboard (index.html)
 html_content = """<!DOCTYPE html>
 <html>
 <head>
@@ -111,4 +114,3 @@ html_content += """
 
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
-    
