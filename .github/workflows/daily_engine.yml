@@ -2,8 +2,8 @@ name: Daily Whop Product Engine
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Har raat UTC midnight par auto run hoga
-  workflow_dispatch:     # Manual run button ke liye
+    - cron: '0 6 * * *'  # Har roz Subah 11:00 AM PKT par auto run hoga
+  workflow_dispatch:     # Manual run button
 
 jobs:
   build-and-deploy:
