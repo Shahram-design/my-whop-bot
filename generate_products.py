@@ -1,6 +1,5 @@
 import os
-import json
-import urllib.request
+from google import genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
@@ -8,17 +7,13 @@ def get_gemini_response(prompt):
     if not GEMINI_API_KEY:
         print("GEMINI_API_KEY missing!")
         return None
-    
-    # Updated direct v1 API endpoint with valid gemini model
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-    headers = {'Content-Type': 'application/json'}
-    data = {"contents": [{"parts": [{"text": prompt}]}]}
-    
-    req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers=headers)
     try:
-        with urllib.request.urlopen(req) as response:
-            res_data = json.loads(response.read().decode('utf-8'))
-            return res_data['candidates'][0]['content']['parts'][0]['text']
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+        return response.text
     except Exception as e:
         print(f"API Error: {e}")
         return None
@@ -47,12 +42,11 @@ if gen_output:
         if raw_p.strip():
             products_data.append({"id": idx, "content": raw_p.strip()})
 else:
-    # Backup Fallback
     for idx in range(1, 6):
         content = f"# Digital Product {idx}: Automation Toolkit\n\nPrice: ${4.99 + idx}\n\n## Description\nComplete guide for digital automation.\n\n## Script\nVisual: Dynamic preview of digital dashboard.\nVoiceover: Grow your ChatCommerce business on autopilot!\n\n#chatcommerce #automation"
         products_data.append({"id": idx, "content": content})
 
-# 1. Generate Product HTML Details Pages
+# Generate HTML Details Pages
 for p in products_data:
     filename = f"products/product_{p['id']}.html"
     p_html = f"""<!DOCTYPE html>
@@ -76,7 +70,7 @@ for p in products_data:
     with open(filename, "w", encoding="utf-8") as f:
         f.write(p_html)
 
-# 2. Generate Main Dashboard
+# Generate Main Dashboard
 html_content = """<!DOCTYPE html>
 <html>
 <head>
@@ -114,3 +108,4 @@ html_content += """
 
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
+    
