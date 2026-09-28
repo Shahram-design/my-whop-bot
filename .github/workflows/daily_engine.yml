@@ -2,8 +2,8 @@ name: Daily Whop Product Engine
 
 on:
   schedule:
-    - cron: '0 6 * * *' # Har roz Subah 11:00 AM PKT par auto run hoga
-  workflow_dispatch: # Manual run button
+    - cron: '0 6 * * *'
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -17,11 +17,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
-          pip install google-generativeai
+          pip install google-genai
 
       - name: Run Generator Script
         env:
@@ -35,4 +35,3 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
           git diff-index --quiet HEAD || (git commit -m "Auto-generate daily products & scripts" && git push)
-          
